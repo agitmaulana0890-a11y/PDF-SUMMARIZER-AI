@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\SimulationLog;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 
 class SimulationController extends Controller
@@ -27,24 +28,32 @@ class SimulationController extends Controller
             'session_token' => 'required|string|max:64',
         ]);
 
-        $anonymizedIp = SimulationLog::anonymizeIp($request->ip());
-        $userAgent = $request->userAgent() ?? 'Unknown';
+        try {
+            $anonymizedIp = SimulationLog::anonymizeIp($request->ip());
+            $userAgent = $request->userAgent() ?? 'Unknown';
 
-        $log = SimulationLog::firstOrCreate(
-            ['session_token' => $validated['session_token']],
-            [
-                'ip_address' => $anonymizedIp,
-                'user_agent' => $userAgent,
-                'file_selected' => false,
-                'cta_login_clicked' => false,
-                'debrief_viewed' => false,
-            ]
-        );
+            $log = SimulationLog::firstOrCreate(
+                ['session_token' => $validated['session_token']],
+                [
+                    'ip_address' => $anonymizedIp,
+                    'user_agent' => $userAgent,
+                    'file_selected' => false,
+                    'cta_login_clicked' => false,
+                    'debrief_viewed' => false,
+                ]
+            );
 
-        return response()->json([
-            'status' => 'success',
-            'session_token' => $log->session_token,
-        ]);
+            return response()->json([
+                'status' => 'success',
+                'session_token' => $log->session_token,
+            ]);
+        } catch (\Throwable $e) {
+            Log::warning("Telemetry visit error: " . $e->getMessage());
+            return response()->json([
+                'status' => 'fallback',
+                'session_token' => $validated['session_token'],
+            ]);
+        }
     }
 
     /**
@@ -58,26 +67,33 @@ class SimulationController extends Controller
             'file_size_kb' => 'nullable|integer|min:0|max:1048576',
         ]);
 
-        $log = SimulationLog::firstOrNew(['session_token' => $validated['session_token']]);
+        try {
+            $log = SimulationLog::firstOrNew(['session_token' => $validated['session_token']]);
 
-        // If newly created, populate visitor telemetry
-        if (!$log->exists) {
-            $log->ip_address = SimulationLog::anonymizeIp($request->ip());
-            $log->user_agent = $request->userAgent() ?? 'Unknown';
+            if (!$log->exists) {
+                $log->ip_address = SimulationLog::anonymizeIp($request->ip());
+                $log->user_agent = $request->userAgent() ?? 'Unknown';
+            }
+
+            $log->file_selected = true;
+            if (!empty($validated['file_extension'])) {
+                $ext = strtolower(trim($validated['file_extension']));
+                $log->file_extension = str_starts_with($ext, '.') ? $ext : '.' . $ext;
+            }
+            $log->file_size_kb = $validated['file_size_kb'] ?? 0;
+            $log->save();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'File metadata recorded safely (Privacy-by-Design)',
+            ]);
+        } catch (\Throwable $e) {
+            Log::warning("Telemetry file selected error: " . $e->getMessage());
+            return response()->json([
+                'status' => 'fallback',
+                'message' => 'Handled safely via fallback',
+            ]);
         }
-
-        $log->file_selected = true;
-        if (!empty($validated['file_extension'])) {
-            $ext = strtolower(trim($validated['file_extension']));
-            $log->file_extension = str_starts_with($ext, '.') ? $ext : '.' . $ext;
-        }
-        $log->file_size_kb = $validated['file_size_kb'] ?? 0;
-        $log->save();
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'File metadata recorded safely (Privacy-by-Design)',
-        ]);
     }
 
     /**
@@ -89,19 +105,25 @@ class SimulationController extends Controller
             'session_token' => 'required|string|max:64',
         ]);
 
-        $log = SimulationLog::firstOrNew(['session_token' => $validated['session_token']]);
+        $redirectUrl = route('simulation.debrief', ['token' => $validated['session_token']]);
 
-        if (!$log->exists) {
-            $log->ip_address = SimulationLog::anonymizeIp($request->ip());
-            $log->user_agent = $request->userAgent() ?? 'Unknown';
+        try {
+            $log = SimulationLog::firstOrNew(['session_token' => $validated['session_token']]);
+
+            if (!$log->exists) {
+                $log->ip_address = SimulationLog::anonymizeIp($request->ip());
+                $log->user_agent = $request->userAgent() ?? 'Unknown';
+            }
+
+            $log->cta_login_clicked = true;
+            $log->save();
+        } catch (\Throwable $e) {
+            Log::warning("Telemetry CTA error: " . $e->getMessage());
         }
-
-        $log->cta_login_clicked = true;
-        $log->save();
 
         return response()->json([
             'status' => 'success',
-            'redirect_url' => route('simulation.debrief', ['token' => $log->session_token]),
+            'redirect_url' => $redirectUrl,
         ]);
     }
 
@@ -114,9 +136,13 @@ class SimulationController extends Controller
         $log = null;
 
         if ($token) {
-            $log = SimulationLog::where('session_token', $token)->first();
-            if ($log) {
-                $log->update(['debrief_viewed' => true]);
+            try {
+                $log = SimulationLog::where('session_token', $token)->first();
+                if ($log) {
+                    $log->update(['debrief_viewed' => true]);
+                }
+            } catch (\Throwable $e) {
+                Log::warning("Telemetry debrief error: " . $e->getMessage());
             }
         }
 
