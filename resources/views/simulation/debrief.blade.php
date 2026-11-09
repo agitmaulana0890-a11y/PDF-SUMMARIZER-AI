@@ -153,7 +153,8 @@
                 <!-- Call to Action / Completion Buttons -->
                 <div class="border-t border-slate-200 pt-8 flex items-center justify-center">
                     <a 
-                        href="{{ route('simulation.index') }}" 
+                        href="{{ route('simulation.index', ['new' => 1]) }}" 
+                        onclick="try { localStorage.removeItem('sim_session_uuid'); } catch(e){}"
                         class="inline-flex items-center justify-center px-8 py-3 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 font-semibold text-sm shadow-xs transition-all hover:-translate-y-0.5"
                     >
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
@@ -167,4 +168,16 @@
 
     </div>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+    // Ketika pengguna telah mencapai tahap debriefing, simulasi dianggap tuntas.
+    // Hapus token sesi lama dari browser agar sesi pengujian berikutnya otomatis tercatat sebagai pengunjung baru.
+    try {
+        localStorage.removeItem('sim_session_uuid');
+    } catch (e) {
+        console.warn('LocalStorage error:', e);
+    }
+</script>
 @endsection

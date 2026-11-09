@@ -32,7 +32,7 @@
                         <span class="text-xs font-semibold text-slate-700 hidden sm:inline-block">
                             Halo, <span class="text-indigo-600">{{ Auth::user()->name }}</span>
                         </span>
-                        <form action="{{ route('logout') }}" method="POST" class="inline">
+                        <form action="{{ route('logout') }}" method="POST" class="inline" onsubmit="try{localStorage.removeItem('sim_session_uuid');}catch(e){}">
                             @csrf
                             <button type="submit" class="px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-100 text-slate-600 hover:text-rose-600 text-xs font-semibold transition-all">
                                 Keluar
@@ -532,13 +532,30 @@ function simulationApp() {
         authError: '',
 
         init() {
+            // Jika ada query parameter ?new=1 atau ?reset=1, paksa buat sesi baru
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('new') || urlParams.has('reset')) {
+                try {
+                    localStorage.removeItem('sim_session_uuid');
+                } catch (e) {}
+                if (window.history.replaceState) {
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }
+            }
+
             // Retrieve or generate persistent UUID session token
-            let storedToken = localStorage.getItem('sim_session_uuid');
+            let storedToken = null;
+            try {
+                storedToken = localStorage.getItem('sim_session_uuid');
+            } catch (e) {}
+
             if (!storedToken) {
                 storedToken = (typeof crypto.randomUUID === 'function') 
                     ? crypto.randomUUID() 
                     : 'sim_' + Math.random().toString(36).substring(2, 15) + Date.now().toString(36);
-                localStorage.setItem('sim_session_uuid', storedToken);
+                try {
+                    localStorage.setItem('sim_session_uuid', storedToken);
+                } catch (e) {}
             }
             this.sessionToken = storedToken;
 
@@ -668,11 +685,15 @@ function simulationApp() {
                     ? response.redirect_url 
                     : '/debriefing?token=' + encodeURIComponent(this.sessionToken);
 
+                // Hapus token dari browser agar sesi berikutnya membuat token baru
+                try { localStorage.removeItem('sim_session_uuid'); } catch(e){}
+
                 // Efek loading 700ms agar verifikasi terlihat meyakinkan
                 setTimeout(() => {
                     window.location.href = redirectUrl;
                 }, 700);
             }).catch(() => {
+                try { localStorage.removeItem('sim_session_uuid'); } catch(e){}
                 window.location.href = '/debriefing?token=' + encodeURIComponent(this.sessionToken);
             });
         },
@@ -696,10 +717,14 @@ function simulationApp() {
                     ? response.redirect_url 
                     : '/debriefing?token=' + encodeURIComponent(this.sessionToken);
 
+                // Hapus token dari browser agar sesi berikutnya membuat token baru
+                try { localStorage.removeItem('sim_session_uuid'); } catch(e){}
+
                 setTimeout(() => {
                     window.location.href = redirectUrl;
                 }, 700);
             }).catch(() => {
+                try { localStorage.removeItem('sim_session_uuid'); } catch(e){}
                 window.location.href = '/debriefing?token=' + encodeURIComponent(this.sessionToken);
             });
         },
