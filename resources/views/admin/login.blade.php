@@ -13,7 +13,7 @@
                 </svg>
             </div>
             
-            <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight">Admin Telemetri</h2>
+            <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight">Admin Gagah</h2>
             <p class="mt-1 text-xs text-slate-500">
                 Masuk untuk melihat metrik dan log kesadaran simulasi keamanan siber.
             </p>
@@ -36,7 +36,7 @@
 
             <div>
                 <label for="pin" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
-                    PIN Keamanan Admin
+                    Password
                 </label>
                 <div class="relative">
                     <input 
@@ -45,13 +45,8 @@
                         type="password" 
                         required 
                         autofocus
-                        placeholder="Ketik PIN akses admin..."
                         class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all font-mono tracking-widest"
                     >
-                </div>
-                <div class="mt-2 flex items-center justify-between text-[11px] text-slate-500">
-                    <span>Default PIN: <code class="px-1.5 py-0.5 rounded bg-slate-100 font-mono text-indigo-700 font-bold">admin123</code></span>
-                    <span class="text-slate-400">(Dapat diubah via .env)</span>
                 </div>
             </div>
 

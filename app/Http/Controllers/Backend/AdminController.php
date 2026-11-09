@@ -42,7 +42,7 @@ class AdminController extends Controller
             return redirect()->route('admin.dashboard')->with('success', 'Berhasil masuk ke Dashboard Admin!');
         }
 
-        return back()->withErrors(['pin' => 'PIN Admin tidak valid. Default: admin123']);
+        return back()->withErrors(['pin' => 'Password tidak valid.']);
     }
 
     /**

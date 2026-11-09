@@ -65,7 +65,6 @@
                 <span>Program Pelatihan Keamanan Siber &bullet; Privacy-by-Design</span>
             </div>
             <div class="flex items-center space-x-4">
-                <a href="{{ route('admin.dashboard') }}" class="text-slate-400 hover:text-indigo-600 transition-colors">Admin Panel</a>
                 <a href="{{ route('simulation.debrief') }}" class="text-slate-400 hover:text-indigo-600 transition-colors">Halaman Edukasi</a>
             </div>
         </div>
