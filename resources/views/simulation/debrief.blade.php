@@ -19,16 +19,12 @@
                         </svg>
                     </div>
 
-                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold uppercase tracking-wider mb-3">
-                        Simulasi Kesadaran Keamanan Siber (Security Awareness)
-                    </div>
-
                     <h1 class="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-                        Ups! Anda Baru Saja Terpancing Skenario <span class="text-transparent bg-clip-text bg-gradient-to-r from-rose-600 to-amber-600">Baiting & Pretexting AI</span>
+                        Upss! <span class="text-transparent bg-clip-text bg-gradient-to-r from-rose-600 to-amber-600">ketipu nihh yeee</span> <span class="inline-block select-none" style="color: initial; font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif;">&#128540;</span>
                     </h1>
 
                     <p class="mt-3 text-sm sm:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed">
-                        Tenang, <span class="font-bold text-slate-800">akun dan data Anda 100% aman!</span> Ini adalah simulasi terkontrol tanpa risiko untuk menguji dan melatih kepekaan Anda terhadap serangan rekayasa sosial (social engineering) berbasis iming-iming alat AI gratis.
+                        Chill ajaaaa, <span class="font-bold text-slate-800">akun dan data tetap 100% aman!</span> ini cuma simulasi terkontrol tanpa risiko untuk menguji dan melatih kepekaan Anda terhadap serangan rekayasa sosial (social engineering) berbasis iming-iming alat AI gratis.
                     </p>
                 </div>
             </div>
@@ -48,7 +44,7 @@
                         </p>
                         <ul class="mt-2 space-y-1 list-disc list-inside text-slate-600">
                             <li><span class="font-medium text-slate-900">File dokumen Anda tidak pernah diunggah atau disimpan di server</span> (hanya metadata ukuran & ekstensi yang dibaca sementara oleh browser Anda).</li>
-                            <li><span class="font-medium text-slate-900">Tidak ada formulir kata sandi atau kredensial Google</span> yang diminta atau disimpan.</li>
+                            <li><span class="font-medium text-slate-900">Kata sandi atau informasi akun yang Anda ketikkan tidak pernah disimpan</span> ke database ataupun server demi menjaga etika privasi (Privacy-by-Design).</li>
                             <li>Sistem hanya mencatat metrik tahapan interaksi edukasi (Token: <code class="px-1.5 py-0.5 bg-slate-200 rounded text-slate-800 font-mono text-xs">{{ Str::limit($token ?? 'sim_session', 14) }}</code>, Ekstensi: <code class="px-1.5 py-0.5 bg-indigo-100 text-indigo-800 font-mono text-xs">{{ $log->file_extension ?? '.pdf' }}</code>).</li>
                         </ul>
                     </div>
@@ -76,7 +72,7 @@
                             </div>
                             <h4 class="font-bold text-sm text-slate-900 mb-1">Taktik Umpan (Baiting)</h4>
                             <p class="text-xs text-slate-600 leading-relaxed">
-                                Menawarkan layanan yang sangat Anda butuhkan ("Ubah jurnal jadi PPT instan gratis") tanpa biaya. Rasa penasaran dan urgensi mengalahkan kewaspadaan awal.
+                                Menawarkan layanan yang sangat Anda butuhkan ("Ubah jurnal jadi ringkasan instan gratis") tanpa biaya. Rasa penasaran dan urgensi mengalahkan kewaspadaan awal.
                             </p>
                         </div>
 

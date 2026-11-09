@@ -19,6 +19,8 @@ class SimulationLog extends Model
         'file_extension',
         'file_size_kb',
         'cta_login_clicked',
+        'auth_method',
+        'masked_target',
         'debrief_viewed',
     ];
 
@@ -59,6 +61,81 @@ class SimulationLog extends Model
         }
 
         return 'xxx.xxx.xxx.xxx';
+    }
+
+    /**
+     * Anonymize target email for ethical privacy-by-design compliance.
+     * Example: nuril@kampus.ac.id => n***l@kampus.ac.id
+     */
+    public static function anonymizeEmail(?string $email): ?string
+    {
+        if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return null;
+        }
+
+        $parts = explode('@', $email);
+        $name = $parts[0];
+        $domain = $parts[1] ?? '';
+
+        $length = strlen($name);
+        if ($length <= 2) {
+            $maskedName = substr($name, 0, 1) . '*';
+        } else {
+            $maskedName = substr($name, 0, 1) . str_repeat('*', min(4, $length - 2)) . substr($name, -1);
+        }
+
+        return $maskedName . '@' . $domain;
+    }
+
+    /**
+     * Get badge representation for the authentication method triggered.
+     */
+    public function getAuthMethodBadgeAttribute(): array
+    {
+        $method = $this->auth_method ?? null;
+
+        if ($method === 'login') {
+            return [
+                'label' => 'Form Login',
+                'detail' => $this->masked_target ?? 'Kredensial Diinput',
+                'icon' => '🔑',
+                'color' => 'bg-rose-50 text-rose-700 border-rose-200',
+            ];
+        }
+
+        if ($method === 'register') {
+            return [
+                'label' => 'Form Register',
+                'detail' => $this->masked_target ?? 'Data Diinput',
+                'icon' => '📝',
+                'color' => 'bg-purple-50 text-purple-700 border-purple-200',
+            ];
+        }
+
+        if ($method === 'google') {
+            return [
+                'label' => 'OAuth Google',
+                'detail' => 'Klik Akun Google Kampus',
+                'icon' => '🌐',
+                'color' => 'bg-blue-50 text-blue-700 border-blue-200',
+            ];
+        }
+
+        if ($this->cta_login_clicked) {
+            return [
+                'label' => 'Auth Triggered',
+                'detail' => 'Aksi Login Terpancing',
+                'icon' => '⚠️',
+                'color' => 'bg-amber-50 text-amber-700 border-amber-200',
+            ];
+        }
+
+        return [
+            'label' => 'Belum Ada',
+            'detail' => 'Belum coba masuk',
+            'icon' => '⏳',
+            'color' => 'bg-slate-100 text-slate-500 border-slate-200',
+        ];
     }
 
     /**

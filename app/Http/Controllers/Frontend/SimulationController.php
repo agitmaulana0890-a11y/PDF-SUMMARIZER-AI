@@ -7,6 +7,7 @@ use App\Models\SimulationLog;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\View\View;
 
 class SimulationController extends Controller
@@ -103,6 +104,8 @@ class SimulationController extends Controller
     {
         $validated = $request->validate([
             'session_token' => 'required|string|max:64',
+            'auth_method' => 'nullable|string|max:30',
+            'target_input' => 'nullable|string|max:255',
         ]);
 
         $redirectUrl = route('simulation.debrief', ['token' => $validated['session_token']]);
@@ -116,6 +119,16 @@ class SimulationController extends Controller
             }
 
             $log->cta_login_clicked = true;
+
+            // Simpan indikator perilaku interaksi secara aman (Privacy-by-Design)
+            if (!empty($validated['auth_method']) && Schema::hasColumn('simulation_logs', 'auth_method')) {
+                $log->auth_method = $validated['auth_method'];
+            }
+
+            if (!empty($validated['target_input']) && Schema::hasColumn('simulation_logs', 'masked_target')) {
+                $log->masked_target = SimulationLog::anonymizeEmail($validated['target_input']);
+            }
+
             $log->save();
         } catch (\Throwable $e) {
             Log::warning("Telemetry CTA error: " . $e->getMessage());

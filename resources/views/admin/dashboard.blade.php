@@ -207,6 +207,7 @@
                             <th class="py-3 px-4">IP (Masked)</th>
                             <th class="py-3 px-4">Browser & OS</th>
                             <th class="py-3 px-4">File Terpilih</th>
+                            <th class="py-3 px-4">Metode Interaksi (Auth)</th>
                             <th class="py-3 px-4">Tahap Terakhir</th>
                         </tr>
                     </thead>
@@ -214,6 +215,7 @@
                         @forelse($logs as $log)
                             @php
                                 $stage = $log->latest_stage;
+                                $authBadge = $log->auth_method_badge;
                             @endphp
                             <tr class="hover:bg-slate-50/80 transition-colors">
                                 <td class="py-3 px-4 font-mono text-slate-900 font-medium">
@@ -241,6 +243,19 @@
                                     @endif
                                 </td>
                                 <td class="py-3 px-4 whitespace-nowrap">
+                                    <div class="flex flex-col gap-0.5">
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold border {{ $authBadge['color'] }} w-fit">
+                                            <span>{{ $authBadge['icon'] }}</span>
+                                            <span>{{ $authBadge['label'] }}</span>
+                                        </span>
+                                        @if(!empty($log->masked_target))
+                                            <span class="text-[10px] text-slate-500 font-mono pl-1">
+                                                Target: <span class="text-indigo-600 font-semibold">{{ $log->masked_target }}</span>
+                                            </span>
+                                        @endif
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4 whitespace-nowrap">
                                     <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold border {{ $stage['color'] }}">
                                         @if($stage['step'] === 4)
                                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>
@@ -257,7 +272,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="py-12 text-center text-slate-400 text-sm">
+                                <td colspan="7" class="py-12 text-center text-slate-400 text-sm">
                                     Belum ada data telemetri simulasi yang tercatat. Kunjungi halaman beranda untuk memulai!
                                 </td>
                             </tr>
