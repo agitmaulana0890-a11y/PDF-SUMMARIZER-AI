@@ -338,7 +338,7 @@
 
 @section('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', () => {
     
     // --- Funnel Stage Bar Chart ---
     const funnelCtx = document.getElementById('funnelChart');
